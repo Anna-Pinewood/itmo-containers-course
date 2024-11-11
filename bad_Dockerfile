@@ -1,0 +1,20 @@
+FROM jupyterhub/jupyterhub:3.1.1
+
+# 1- using latest and not pinning versions
+RUN apt update && apt install -y python3-dev git vim nano
+
+# 2 - Not cleaning up apt cache
+RUN pip install --upgrade pip
+RUN pip install numpy pandas matplotlib scikit-learn
+
+# 3 – Running as root by default
+
+WORKDIR /jupyter
+
+# 4 – Not using proper volume declaration
+VOLUME /data
+
+EXPOSE 8000
+
+ENTRYPOINT ["jupyterhub"]
+CMD ["--log-level=DEBUG"]

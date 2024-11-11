@@ -1,0 +1,29 @@
+FROM jupyterhub/jupyterhub:3.1.1 AS builder
+
+# 1, 2 – install system dependencies and clean up
+RUN apt-get update && apt-get install -y \
+    python3-dev=3.9.2-3 \
+    git=1:2.30.2-1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM jupyterhub/jupyterhub:3.1.1
+
+# Copy only necessary files from builder
+COPY --from=builder /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
+
+# 3 – Create non-root user
+RUN useradd -m -s /bin/bash jupyter_user
+USER jupyter_user
+
+WORKDIR /home/jupyter_user
+
+# 4 – Declare volumes properly
+VOLUME ["/home/jupyter_user/data"]
+
+EXPOSE 8000
+
+ENTRYPOINT ["jupyterhub"]
+CMD ["--log-level=INFO"]
