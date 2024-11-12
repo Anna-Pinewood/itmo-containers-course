@@ -10,21 +10,21 @@ def get_database_connection():
         password=os.getenv("POSTGRES_PASSWORD", "postgres")
     )
 
-def init_database():
-    """Initialize the database."""
-    conn = get_database_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS achievements (
-            id SERIAL PRIMARY KEY,
-            description TEXT NOT NULL,
-            points INTEGER NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
+# def init_database():
+#     """Initialize the database."""
+#     conn = get_database_connection()
+#     cur = conn.cursor()
+#     cur.execute("""
+#         CREATE TABLE IF NOT EXISTS achievements (
+#             id SERIAL PRIMARY KEY,
+#             description TEXT NOT NULL,
+#             points INTEGER NOT NULL,
+#             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+#         );
+#     """)
+#     conn.commit()
+#     cur.close()
+#     conn.close()
 
 def add_achievement(description, points):
     """Add an achievement to the database."""
@@ -52,6 +52,15 @@ def delete_all_achievements():
     conn = get_database_connection()
     cur = conn.cursor()
     cur.execute("DELETE FROM achievements")
+    conn.commit()
+    cur.close()
+    conn.close()
+    
+def delete_achievement(achievement_id):
+    """Delete a specific achievement by its ID."""
+    conn = get_database_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM achievements WHERE id = %s", (achievement_id,))
     conn.commit()
     cur.close()
     conn.close()
