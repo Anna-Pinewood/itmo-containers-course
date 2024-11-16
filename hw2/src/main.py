@@ -32,6 +32,24 @@ if st.button("Удалить все достижения"):
     handlers.delete_all_achievements()
     st.warning("Все достижения удалены!")
 
+# txt export
+if st.button("📄 txt сводка"):
+    # Format achievements as text
+    text_content = "Мои достижения:\n\n"
+    for achievement in handlers.get_achievements():
+        # Format: Description (Points pts) - Date
+        text_content += f"• {achievement[1]} ({achievement[2]} pts)\n"
+    
+    # Create an expander with the formatted text
+    with st.expander("Текст для копирования", expanded=True):
+        st.code(text_content, language=None)
+        st.button("Копировать", type="primary", 
+                 on_click=lambda: st.write(
+                     f'<script>navigator.clipboard.writeText(`{text_content}`)</script>', 
+                     unsafe_allow_html=True
+                 ))
+
+
 # Отображение достижений
 with st.expander("Показать все достижения", expanded=True):
     achievements = handlers.get_achievements()
