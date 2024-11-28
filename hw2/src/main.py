@@ -3,6 +3,8 @@ import streamlit as st
 from datetime import datetime
 import os
 import database.handlers as handlers
+from streamlit_extras.let_it_rain import rain
+
 
 st.set_page_config(page_title="Трекер достижений")
 
@@ -47,16 +49,30 @@ def main_app():
     # Achievement input form
     with st.form("achievement_form"):
         description = st.text_input("Ваш вклад в ваши цели")
-        points = st.slider("Оценка вклада", min_value=5, max_value=50, value=5)
+        points = st.slider("Оценка вклада", min_value=5, max_value=50, value=15)
         submitted = st.form_submit_button("Добавить достижение")
 
     if submitted and description:
+
         handlers.add_achievement(description, points, st.session_state.user_id)
         balloon_count = max(1, points // 10)
-        for _ in range(balloon_count):
-            st.balloons()
-        st.success("Достижение добавлено!")
-
+        if points <= 15:
+            for _ in range(balloon_count):
+                st.balloons()
+                st.success("Молодец, так держать!")
+        elif points <= 30:
+            for _ in range(balloon_count):
+                st.balloons()
+                rain(emoji="🥇", font_size=54, falling_speed=2, animation_length=1)
+                st.success("Отличное достижение!")
+        else:
+            for _ in range(balloon_count):
+                st.balloons()
+                rain(emoji="💎", font_size=54, falling_speed=2, animation_length=1)
+            st.success("Выдающееся достижение!")
+            
+        st.session_state.description = ""
+        st.session_state.points = 15
     # Delete all achievements button
     if st.button("Удалить все достижения"):
         handlers.delete_all_achievements(st.session_state.user_id)
@@ -90,7 +106,7 @@ def main_app():
                     <div style="
                         width: {size}px;
                         height: {size}px;
-                        background-color: #1f77b4;
+                        background-color: #fea03d;
                         margin: 5px;
                     "></div>
                 """, unsafe_allow_html=True)
