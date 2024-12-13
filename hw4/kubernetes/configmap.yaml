@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: notejar
+data:
+  DB_HOST: "postgres-service"
+  DB_NAME: "notejardb"
+  STREAMLIT_SERVER_PORT: "8507"

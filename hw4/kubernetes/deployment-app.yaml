@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notejar-app
+  labels:
+    app: notejar
+    tier: frontend
+spec:
+  selector:
+    matchLabels:
+      app: notejar
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: notejar
+        tier: frontend
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for db; sleep 2; done;']
+      containers:
+      - name: notejar
+        imagePullPolicy: Never
+        image: notejar:latest
+        ports:
+        - containerPort: 8507
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: postgres-secret
+        livenessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8507
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+          initialDelaySeconds: 5
+          periodSeconds: 5
